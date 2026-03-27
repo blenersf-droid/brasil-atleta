@@ -45,7 +45,7 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/dashboard/atletas",
+    href: "/athletes",
     label: "Atletas",
     icon: Users,
     allowedRoles: [
@@ -57,8 +57,8 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/dashboard/competicoes",
-    label: "Competições",
+    href: "/competitions",
+    label: "Competicoes",
     icon: Medal,
     allowedRoles: [
       "admin_nacional",
@@ -69,25 +69,25 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/dashboard/scouting",
+    href: "/scouting",
     label: "Scouting",
     icon: Search,
     allowedRoles: ["admin_nacional", "confederacao", "federacao"],
   },
   {
-    href: "/dashboard/mapa-de-talentos",
+    href: "/mapa-de-talentos",
     label: "Mapa de Talentos",
     icon: Map,
     allowedRoles: ["admin_nacional", "confederacao", "federacao"],
   },
   {
-    href: "/dashboard/funil-esportivo",
+    href: "/funil-esportivo",
     label: "Funil Esportivo",
     icon: TrendingUp,
     allowedRoles: ["admin_nacional", "confederacao", "federacao"],
   },
   {
-    href: "/dashboard/entidades",
+    href: "/entities",
     label: "Entidades",
     icon: Building2,
     allowedRoles: ["admin_nacional", "confederacao", "federacao"],
@@ -99,13 +99,7 @@ const navItems: NavItem[] = [
     allowedRoles: ["admin_nacional", "confederacao", "federacao"],
   },
   {
-    href: "/dashboard/meu-perfil",
-    label: "Meu Perfil",
-    icon: UserCircle,
-    allowedRoles: ["atleta"],
-  },
-  {
-    href: "/dashboard/settings",
+    href: "/settings",
     label: "Configuracoes",
     icon: Settings,
     allowedRoles: [
