@@ -99,6 +99,12 @@ const navItems: NavItem[] = [
     allowedRoles: ["admin_nacional", "confederacao", "federacao"],
   },
   {
+    href: "/meu-perfil",
+    label: "Meu Perfil",
+    icon: UserCircle,
+    allowedRoles: ["atleta"],
+  },
+  {
     href: "/settings",
     label: "Configuracoes",
     icon: Settings,
