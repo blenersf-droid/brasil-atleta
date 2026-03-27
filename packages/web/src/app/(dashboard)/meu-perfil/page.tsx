@@ -14,6 +14,12 @@ import {
   User,
 } from "lucide-react";
 import { MODALITIES } from "@/lib/constants/modalities";
+import { ProfileCompleteness } from "@/components/athletes/profile-completeness";
+import { AchievementsSection } from "./achievements-section";
+import { AddCompetitionDialog } from "./add-competition-dialog";
+import { AddResultDialog } from "./add-result-dialog";
+import { AddAssessmentDialog } from "./add-assessment-dialog";
+import type { AchievementType } from "@/components/athletes/achievement-badge";
 
 const levelLabels: Record<string, string> = {
   school: "Base Escolar",
@@ -92,6 +98,14 @@ export default async function MeuPerfilPage() {
     .order("assessment_date", { ascending: false })
     .limit(10);
 
+  // Fetch achievements
+  const { data: achievements } = await supabase
+    .from("achievements")
+    .select("*")
+    .eq("athlete_id", athlete.id)
+    .order("date", { ascending: false })
+    .limit(30);
+
   const modalityName =
     MODALITIES.find((m) => m.code === athlete.primary_modality)?.name ||
     athlete.primary_modality ||
@@ -103,6 +117,17 @@ export default async function MeuPerfilPage() {
           (365.25 * 24 * 60 * 60 * 1000)
       )
     : null;
+
+  // Profile completeness data
+  const hasPhoto = !!athlete.photo_url;
+  const hasBio = !!(athlete as Record<string, unknown>).bio;
+  const hasModality = !!athlete.primary_modality;
+  const hasCompetition = (results ?? []).some(
+    (r) => r.competition_id
+  );
+  const hasResult = (results ?? []).length > 0;
+  const hasAssessment = (assessments ?? []).length > 0;
+  const hasAchievement = (achievements ?? []).length > 0;
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6">
@@ -146,6 +171,17 @@ export default async function MeuPerfilPage() {
       </div>
 
       <Separator />
+
+      {/* Profile Completeness (Story 11.3) */}
+      <ProfileCompleteness
+        hasPhoto={hasPhoto}
+        hasBio={hasBio}
+        hasModality={hasModality}
+        hasCompetition={hasCompetition}
+        hasResult={hasResult}
+        hasAssessment={hasAssessment}
+        hasAchievement={hasAchievement}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -197,6 +233,19 @@ export default async function MeuPerfilPage() {
         </Card>
       </div>
 
+      {/* Achievements Section (Story 11.4) */}
+      <AchievementsSection
+        athleteId={athlete.id}
+        achievements={(achievements ?? []).map((a: Record<string, unknown>) => ({
+          id: a.id as string,
+          title: a.title as string,
+          competition_name: a.competition_name as string | null,
+          date: a.date as string | null,
+          type: a.type as AchievementType,
+          description: a.description as string | null,
+        }))}
+      />
+
       {/* Tabs */}
       <Tabs defaultValue="resultados">
         <TabsList>
@@ -207,6 +256,15 @@ export default async function MeuPerfilPage() {
 
         {/* Results Tab */}
         <TabsContent value="resultados" className="mt-4">
+          {/* Action buttons (Story 11.1) */}
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <AddCompetitionDialog
+              athleteId={athlete.id}
+              athleteModality={athlete.primary_modality || ""}
+            />
+            <AddResultDialog athleteId={athlete.id} />
+          </div>
+
           {results && results.length > 0 ? (
             <div className="space-y-3">
               {results.map((result: Record<string, unknown>) => {
@@ -283,7 +341,7 @@ export default async function MeuPerfilPage() {
                 Nenhum resultado registrado ainda.
               </p>
               <p className="text-xs text-[#0a1628]/25 mt-1">
-                Seus resultados serao adicionados pelo seu tecnico ou gestor.
+                Use os botoes acima para adicionar suas competicoes e resultados.
               </p>
             </div>
           )}
@@ -291,6 +349,14 @@ export default async function MeuPerfilPage() {
 
         {/* Assessments Tab */}
         <TabsContent value="avaliacoes" className="mt-4">
+          {/* Action button (Story 11.1) */}
+          <div className="flex items-center gap-2 mb-4">
+            <AddAssessmentDialog
+              athleteId={athlete.id}
+              athleteModality={athlete.primary_modality || ""}
+            />
+          </div>
+
           {assessments && assessments.length > 0 ? (
             <div className="space-y-3">
               {assessments.map((assessment: Record<string, unknown>) => {
@@ -328,6 +394,9 @@ export default async function MeuPerfilPage() {
               <Activity className="size-10 text-[#0a1628]/15 mb-3" />
               <p className="text-sm text-[#0a1628]/40">
                 Nenhuma avaliacao registrada ainda.
+              </p>
+              <p className="text-xs text-[#0a1628]/25 mt-1">
+                Registre seus testes fisicos para mostrar sua preparacao.
               </p>
             </div>
           )}
