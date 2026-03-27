@@ -1,0 +1,492 @@
+# =============================================================================
+# Squad Registry — AIOX Squad Ecosystem
+# =============================================================================
+# Central registry of all installed squads with their agents, tasks, and workflows.
+# Auto-generated: 2026-03-26
+# Location: squads/ (configured in core-config.yaml → squadsLocation)
+# =============================================================================
+
+version: "1.0.0"
+generated_at: "2026-03-26"
+total_squads: 12
+total_agents: 139
+total_tasks: 99
+total_workflows: 23
+
+# =============================================================================
+# SQUAD INDEX
+# =============================================================================
+
+squads:
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 1. Advisory Board — Strategic Counsel
+  # ─────────────────────────────────────────────────────────────────────────
+  advisory-board:
+    display_name: "Advisory Board"
+    description: "Board de 11 conselheiros estrategicos — Ray Dalio, Charlie Munger, Naval Ravikant, Peter Thiel, Reid Hoffman, Simon Sinek, Brene Brown, e mais."
+    path: squads/advisory-board/
+    slash_command: "/advisory-board:board-chair"
+    entry_agent: board-chair
+    tags: [strategy, investment, leadership, mental-models, scaling, entrepreneurship]
+    agent_count: 11
+    agents:
+      - { id: board-chair, role: orchestrator, icon: "🏛️" }
+      - { id: ray-dalio, role: specialist, focus: "investment, risk, principles" }
+      - { id: charlie-munger, role: specialist, focus: "mental models, wisdom" }
+      - { id: naval-ravikant, role: specialist, focus: "wealth, leverage, freedom" }
+      - { id: peter-thiel, role: specialist, focus: "contrarian thinking, monopoly" }
+      - { id: reid-hoffman, role: specialist, focus: "scaling, networks" }
+      - { id: simon-sinek, role: specialist, focus: "purpose, leadership" }
+      - { id: brene-brown, role: specialist, focus: "vulnerability, courage, trust" }
+      - { id: patrick-lencioni, role: specialist, focus: "team health, accountability" }
+      - { id: derek-sivers, role: specialist, focus: "minimalist entrepreneurship" }
+      - { id: yvon-chouinard, role: specialist, focus: "mission-driven business" }
+    tasks:
+      - convene-board
+      - diagnose
+      - evaluate-scaling
+      - get-founder-counsel
+      - resolve-culture-crisis
+      - review
+      - seek-investment-counsel
+    workflows:
+      - wf-board-meeting
+      - wf-decision-framework
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 2. Brand Squad — Brand Strategy & Identity
+  # ─────────────────────────────────────────────────────────────────────────
+  brand-squad:
+    display_name: "Brand Squad"
+    description: "Squad de 15 agentes de branding — Al Ries, David Aaker, Marty Neumeier, Donald Miller, e mais."
+    path: squads/brand-squad/
+    slash_command: "/brand-squad:brand-chief"
+    entry_agent: brand-chief
+    tags: [branding, positioning, identity, naming, archetype, storytelling]
+    agent_count: 15
+    agents:
+      - { id: brand-chief, role: orchestrator, icon: "👑" }
+      - { id: al-ries, role: specialist, focus: "positioning, category" }
+      - { id: alina-wheeler, role: specialist, focus: "brand identity design" }
+      - { id: archetype-consultant, role: specialist, focus: "brand archetypes" }
+      - { id: byron-sharp, role: specialist, focus: "brand growth science" }
+      - { id: david-aaker, role: specialist, focus: "brand equity" }
+      - { id: denise-yohn, role: specialist, focus: "brand leadership" }
+      - { id: domain-scout, role: specialist, focus: "domain availability" }
+      - { id: donald-miller, role: specialist, focus: "StoryBrand framework" }
+      - { id: emily-heyward, role: specialist, focus: "brand building" }
+      - { id: jean-noel-kapferer, role: specialist, focus: "brand prism" }
+      - { id: kevin-keller, role: specialist, focus: "brand management" }
+      - { id: marty-neumeier, role: specialist, focus: "brand gap, zag" }
+      - { id: miller-sticky-brand, role: specialist, focus: "sticky branding" }
+      - { id: naming-strategist, role: specialist, focus: "naming strategy" }
+    tasks:
+      - audit-brand
+      - build-identity
+      - create-brand-story
+      - create-positioning
+      - design-architecture
+      - diagnose
+      - generate-names
+      - map-archetype
+      - review
+    workflows:
+      - wf-brand-creation
+      - wf-rebrand
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 3. C-Level Squad — Executive Strategy
+  # ─────────────────────────────────────────────────────────────────────────
+  c-level-squad:
+    display_name: "C-Level Squad"
+    description: "Squad de 6 agentes C-Level — CEO, CTO, CMO, COO, CIO, CAIO."
+    path: squads/c-level-squad/
+    slash_command: "/c-level-squad:vision-chief"
+    entry_agent: vision-chief
+    tags: [executive, strategy, technology, marketing, operations, innovation]
+    agent_count: 6
+    agents:
+      - { id: vision-chief, role: orchestrator, icon: "🎯" }
+      - { id: caio-architect, role: specialist, focus: "AI strategy" }
+      - { id: cio-engineer, role: specialist, focus: "information technology" }
+      - { id: cmo-architect, role: specialist, focus: "marketing strategy" }
+      - { id: coo-orchestrator, role: specialist, focus: "operations" }
+      - { id: cto-architect, role: specialist, focus: "technology architecture" }
+    tasks:
+      - design-operations
+      - diagnose
+      - evaluate-technology
+      - plan-fundraise
+      - plan-go-to-market
+      - review
+      - set-vision
+    workflows:
+      - wf-board-presentation
+      - wf-strategic-planning
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 4. Claude Code Mastery — Claude Code Expertise
+  # ─────────────────────────────────────────────────────────────────────────
+  claude-code-mastery:
+    display_name: "Claude Code Mastery Squad"
+    description: "Squad de 8 agentes especialistas em Claude Code — hooks, MCP, subagents, config, skills, integração, roadmap."
+    path: squads/claude-code-mastery/
+    slash_command: "/claude-code-mastery:claude-mastery-chief"
+    entry_agent: claude-mastery-chief
+    tags: [claude-code, hooks, mcp, subagents, config, skills, context-engineering]
+    agent_count: 8
+    agents:
+      - { id: claude-mastery-chief, role: orchestrator, icon: "🧠" }
+      - { id: hooks-architect, role: specialist, focus: "hook events, automation" }
+      - { id: mcp-integrator, role: specialist, focus: "MCP servers, tool discovery" }
+      - { id: swarm-orchestrator, role: specialist, focus: "agent teams, multi-session" }
+      - { id: config-engineer, role: specialist, focus: "settings, permissions, CLAUDE.md" }
+      - { id: skill-craftsman, role: specialist, focus: "skills, commands, plugins" }
+      - { id: project-integrator, role: specialist, focus: "project integration, repo setup" }
+      - { id: roadmap-sentinel, role: specialist, focus: "roadmap tracking, changelog" }
+    tasks:
+      - audit-integration
+      - audit-settings
+      - audit-setup
+      - brownfield-setup
+      - ci-cd-setup
+      - claude-md-engineer
+      - configure-claude-code
+      - context-rot-audit
+      - create-agent-definition
+      - create-rules
+      - create-team-topology
+      - diagnose
+      - enterprise-config
+      - hook-designer
+      - integrate-project
+      - mcp-integration-plan
+      - mcp-workflow
+      - multi-project-setup
+      - optimize-context
+      - optimize-workflow
+      - parallel-decomposition
+      - permission-strategy
+      - sandbox-setup
+      - setup-repository
+      - setup-wizard
+      - worktree-strategy
+    workflows:
+      - wf-audit-complete
+      - wf-knowledge-update
+      - wf-project-setup
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 5. Copy Squad — Copywriting Elite
+  # ─────────────────────────────────────────────────────────────────────────
+  copy-squad:
+    display_name: "Copy Squad"
+    description: "Squad de elite com 23 agentes — 22 copywriters lendarios + 1 orquestrador. Direct response, email, funis, VSLs, cartas de vendas."
+    path: squads/copy-squad/
+    slash_command: "/copy-squad:copy-chief"
+    entry_agent: copy-chief
+    tags: [copywriting, direct-response, sales-letter, email, vsl, funnel, headline, offer]
+    agent_count: 23
+    agents:
+      - { id: copy-chief, role: orchestrator, icon: "✍️" }
+      # Tier 1A — Direct Response Legends
+      - { id: gary-halbert, role: specialist, tier: "1A", focus: "direct mail, personality copy" }
+      - { id: eugene-schwartz, role: specialist, tier: "1A", focus: "awareness levels, breakthrough" }
+      - { id: claude-hopkins, role: specialist, tier: "1A", focus: "scientific advertising" }
+      - { id: gary-bencivenga, role: specialist, tier: "1A", focus: "persuasion, testing" }
+      - { id: robert-collier, role: specialist, tier: "1A", focus: "letter writing" }
+      - { id: john-carlton, role: specialist, tier: "1A", focus: "one-legged golfer style" }
+      - { id: jim-rutz, role: specialist, tier: "1A", focus: "mega-copy, long-form" }
+      # Tier 1B — Modern Copy & Funnels
+      - { id: dan-kennedy, role: specialist, tier: "1B", focus: "no BS marketing" }
+      - { id: frank-kern, role: specialist, tier: "1B", focus: "intent-based branding" }
+      - { id: russell-brunson, role: specialist, tier: "1B", focus: "funnels, DotCom Secrets" }
+      - { id: todd-brown, role: specialist, tier: "1B", focus: "E5 method, big ideas" }
+      - { id: stefan-georgi, role: specialist, tier: "1B", focus: "VSLs, RMBC method" }
+      - { id: jon-benson, role: specialist, tier: "1B", focus: "video sales letters" }
+      - { id: ry-schwartz, role: specialist, tier: "1B", focus: "funnel scripts" }
+      # Tier 1C — Email & Relationship
+      - { id: ben-settle, role: specialist, tier: "1C", focus: "email marketing daily" }
+      - { id: andre-chaperon, role: specialist, tier: "1C", focus: "email sequences, ARM" }
+      - { id: dan-koe, role: specialist, tier: "1C", focus: "one-person business copy" }
+      # Tier 1D — Offers & Sales Pages
+      - { id: joe-sugarman, role: specialist, tier: "1D", focus: "triggers, storytelling ads" }
+      - { id: david-ogilvy, role: specialist, tier: "1D", focus: "brand copy, long headlines" }
+      - { id: clayton-makepeace, role: specialist, tier: "1D", focus: "health/finance copy" }
+      - { id: parris-lampropoulos, role: specialist, tier: "1D", focus: "magalog, controls" }
+      - { id: david-deutsch, role: specialist, tier: "1D", focus: "fascinations, bullets" }
+    tasks:
+      - write-headline
+      - write-sales-letter
+      - write-vsl-script
+      - write-email-sequence
+      - write-ad-copy
+      - write-landing-page
+      - write-bullets
+      - create-funnel-copy
+      - create-offer
+      - analyze-copy
+      - critique-copy
+      - diagnose
+      - review
+    workflows:
+      - wf-full-copy-project
+      - wf-copy-review-cycle
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 6. Cybersecurity — Offensive & Defensive Security
+  # ─────────────────────────────────────────────────────────────────────────
+  cybersecurity:
+    display_name: "Cybersecurity Squad"
+    description: "Squad de 15 agentes de cybersecurity — pentest, recon, incident response, app security."
+    path: squads/cybersecurity/
+    slash_command: "/cybersecurity:cyber-chief"
+    entry_agent: cyber-chief
+    tags: [security, pentest, recon, incident-response, appsec, vulnerability]
+    agent_count: 15
+    agents:
+      - { id: cyber-chief, role: orchestrator, icon: "🛡️" }
+      - { id: busterer, role: specialist, focus: "brute force, enumeration" }
+      - { id: cartographer, role: specialist, focus: "network mapping" }
+      - { id: chris-sanders, role: specialist, focus: "intrusion analysis" }
+      - { id: command-generator, role: specialist, focus: "command generation" }
+      - { id: dirber, role: specialist, focus: "directory busting" }
+      - { id: fuzzer, role: specialist, focus: "fuzzing, input testing" }
+      - { id: georgia-weidman, role: specialist, focus: "penetration testing" }
+      - { id: jim-manico, role: specialist, focus: "application security" }
+      - { id: marcus-carey, role: specialist, focus: "threat intelligence" }
+      - { id: omar-santos, role: specialist, focus: "security operations" }
+      - { id: peter-kim, role: specialist, focus: "hacking methodology" }
+      - { id: ripper, role: specialist, focus: "password cracking" }
+      - { id: rogue, role: specialist, focus: "social engineering" }
+      - { id: shannon-runner, role: specialist, focus: "crypto analysis" }
+    tasks:
+      - analyze-vulnerability
+      - assess-security
+      - audit-app-security
+      - diagnose
+      - generate-commands
+      - respond-incident
+      - review
+      - run-pentest
+      - run-recon
+    workflows:
+      - wf-incident-response
+      - wf-pentest-engagement
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 7. Data Squad — Analytics & Growth
+  # ─────────────────────────────────────────────────────────────────────────
+  data-squad:
+    display_name: "Data Squad"
+    description: "Squad de 7 agentes — analytics, growth, community, retention, audience building."
+    path: squads/data-squad/
+    slash_command: "/data-squad:data-chief"
+    entry_agent: data-chief
+    tags: [analytics, growth, community, retention, audience, metrics]
+    agent_count: 7
+    agents:
+      - { id: data-chief, role: orchestrator, icon: "📊" }
+      - { id: avinash-kaushik, role: specialist, focus: "web analytics" }
+      - { id: david-spinks, role: specialist, focus: "community building" }
+      - { id: nick-mehta, role: specialist, focus: "customer success" }
+      - { id: peter-fader, role: specialist, focus: "customer-centric analytics" }
+      - { id: sean-ellis, role: specialist, focus: "growth hacking" }
+      - { id: wes-kao, role: specialist, focus: "cohort-based learning" }
+    tasks:
+      - analyze-data
+      - build-audience
+      - build-community-strategy
+      - diagnose
+      - measure-growth
+      - optimize-retention
+      - review
+    workflows:
+      - wf-analytics-setup
+      - wf-growth-sprint
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 8. Design Squad — Design Systems & UX
+  # ─────────────────────────────────────────────────────────────────────────
+  design-squad:
+    display_name: "Design Squad"
+    description: "Squad de 8 agentes — design systems, UX, UI, visual generation, design ops."
+    path: squads/design-squad/
+    slash_command: "/design-squad:design-chief"
+    entry_agent: design-chief
+    tags: [design, ux, ui, design-system, visual, accessibility]
+    agent_count: 8
+    agents:
+      - { id: design-chief, role: orchestrator, icon: "🎨" }
+      - { id: brad-frost, role: specialist, focus: "atomic design" }
+      - { id: dan-mall, role: specialist, focus: "design system strategy" }
+      - { id: dave-malouf, role: specialist, focus: "design ops" }
+      - { id: design-system-architect, role: specialist, focus: "design system architecture" }
+      - { id: ui-engineer, role: specialist, focus: "UI implementation" }
+      - { id: ux-designer, role: specialist, focus: "UX research & design" }
+      - { id: visual-generator, role: specialist, focus: "visual assets" }
+    tasks:
+      - audit-design
+      - create-component-spec
+      - create-design-system
+      - design-ux-flow
+      - diagnose
+      - generate-handoff
+      - review
+      - setup-design-ops
+    workflows:
+      - wf-design-system-creation
+      - wf-feature-design
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 9. Hormozi Squad — Business Growth Frameworks
+  # ─────────────────────────────────────────────────────────────────────────
+  hormozi-squad:
+    display_name: "Hormozi Squad"
+    description: "Squad de 16 agentes implementando os frameworks de Alex Hormozi. Offers, leads, pricing, sales, content, hooks, launch, retention, scaling."
+    path: squads/hormozi-squad/
+    slash_command: "/hormozi-squad:hormozi-chief"
+    entry_agent: hormozi-chief
+    tags: [hormozi, offers, leads, pricing, sales, scaling, business]
+    agent_count: 16
+    agents:
+      - { id: hormozi-chief, role: orchestrator, icon: "🐝" }
+      - { id: hormozi-advisor, role: specialist, focus: "strategic advisory" }
+      - { id: hormozi-offers, role: specialist, focus: "Grand Slam Offers" }
+      - { id: hormozi-leads, role: specialist, focus: "Core 4 lead gen" }
+      - { id: hormozi-pricing, role: specialist, focus: "Value Equation pricing" }
+      - { id: hormozi-copy, role: specialist, focus: "direct response copy" }
+      - { id: hormozi-ads, role: specialist, focus: "paid advertising" }
+      - { id: hormozi-content, role: specialist, focus: "content machine" }
+      - { id: hormozi-hooks, role: specialist, focus: "hooks & attention" }
+      - { id: hormozi-launch, role: specialist, focus: "launch methodology" }
+      - { id: hormozi-closer, role: specialist, focus: "CLOSER framework" }
+      - { id: hormozi-workshop, role: specialist, focus: "workshop design" }
+      - { id: hormozi-retention, role: specialist, focus: "retention frameworks" }
+      - { id: hormozi-scale, role: specialist, focus: "scaling operations" }
+      - { id: hormozi-models, role: specialist, focus: "business models" }
+      - { id: hormozi-audit, role: specialist, focus: "business audit" }
+    tasks:
+      - audit-business
+      - close-sale
+      - create-hooks
+      - create-offer
+      - design-workshop
+      - diagnose
+      - generate-leads
+      - plan-launch
+      - review
+      - set-pricing
+    workflows:
+      - wf-business-turnaround
+      - wf-offer-creation
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 10. Movement — Social Movement Building
+  # ─────────────────────────────────────────────────────────────────────────
+  movement:
+    display_name: "Movement Squad"
+    description: "Squad de 7 agentes para construcao de movimentos. Fenomenologia, identidade, manifestos, ciclos de crescimento."
+    path: squads/movement/
+    slash_command: "/movement:movement-chief"
+    entry_agent: movement-chief
+    tags: [movement, community, social-impact, identity, manifesto, phenomenology]
+    agent_count: 7
+    agents:
+      - { id: movement-chief, role: orchestrator, icon: "✊" }
+      - { id: movement-architect, role: specialist, focus: "movement architecture" }
+      - { id: fenomenologo, role: specialist, focus: "phenomenology analysis" }
+      - { id: identitario, role: specialist, focus: "identity construction" }
+      - { id: estrategista-de-ciclo, role: specialist, focus: "growth cycles" }
+      - { id: manifestador, role: specialist, focus: "manifesto writing" }
+      - { id: analista-de-impacto, role: specialist, focus: "impact measurement" }
+    tasks:
+      - analyze-phenomenon
+      - build-movement
+      - create-identity
+      - diagnose
+      - measure-impact
+      - review
+      - write-manifesto
+    workflows:
+      - wf-movement-launch
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 11. Storytelling — Narrative & Presentation
+  # ─────────────────────────────────────────────────────────────────────────
+  storytelling:
+    display_name: "Storytelling Squad"
+    description: "Squad de 12 agentes — Joseph Campbell, Dan Harmon, Nancy Duarte, Kindra Hall, e mais mestres da narrativa."
+    path: squads/storytelling/
+    slash_command: "/storytelling:story-chief"
+    entry_agent: story-chief
+    tags: [storytelling, narrative, presentation, pitch, creative, structure]
+    agent_count: 12
+    agents:
+      - { id: story-chief, role: orchestrator, icon: "📖" }
+      - { id: blake-snyder, role: specialist, focus: "Save the Cat, beat sheets" }
+      - { id: dan-harmon, role: specialist, focus: "story circle" }
+      - { id: joseph-campbell, role: specialist, focus: "hero's journey" }
+      - { id: keith-johnstone, role: specialist, focus: "improv, status games" }
+      - { id: kindra-hall, role: specialist, focus: "strategic storytelling" }
+      - { id: marshall-ganz, role: specialist, focus: "public narrative" }
+      - { id: matthew-dicks, role: specialist, focus: "storyworthy, moth-style" }
+      - { id: nancy-duarte, role: specialist, focus: "presentations, Resonate" }
+      - { id: oren-klaff, role: specialist, focus: "pitch anything, framing" }
+      - { id: park-howell, role: specialist, focus: "business storytelling" }
+      - { id: shawn-coyne, role: specialist, focus: "Story Grid, genre" }
+    tasks:
+      - analyze-story
+      - build-narrative
+      - create-pitch
+      - create-presentation
+      - diagnose
+      - review
+      - unblock-creative
+      - write-manifesto
+    workflows:
+      - wf-brand-narrative
+      - wf-story-development
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # 12. Traffic Masters — Paid Media & Performance
+  # ─────────────────────────────────────────────────────────────────────────
+  traffic-masters:
+    display_name: "Traffic Masters Squad"
+    description: "Squad de 16 agentes — media buying, ads, tracking, creative analysis, scaling. Pedro Sobral, Ralph Burns, Molly Pittman, e mais."
+    path: squads/traffic-masters/
+    slash_command: "/traffic-masters:traffic-chief"
+    entry_agent: traffic-chief
+    tags: [traffic, ads, media-buying, performance, tracking, scaling, creative]
+    agent_count: 16
+    agents:
+      - { id: traffic-chief, role: orchestrator, icon: "🚀" }
+      - { id: ad-midas, role: specialist, focus: "ad optimization" }
+      - { id: ads-analyst, role: specialist, focus: "ad data analysis" }
+      - { id: creative-analyst, role: specialist, focus: "creative performance" }
+      - { id: depesh-mandalia, role: specialist, focus: "Facebook ads mastery" }
+      - { id: fiscal, role: specialist, focus: "ad budget management" }
+      - { id: kasim-aslam, role: specialist, focus: "Google Ads, PMax" }
+      - { id: media-buyer, role: specialist, focus: "media buying execution" }
+      - { id: molly-pittman, role: specialist, focus: "ad strategy" }
+      - { id: nicholas-kusmich, role: specialist, focus: "Facebook ads" }
+      - { id: pedro-sobral, role: specialist, focus: "trafego pago BR" }
+      - { id: performance-analyst, role: specialist, focus: "performance metrics" }
+      - { id: pixel-specialist, role: specialist, focus: "tracking pixels, CAPI" }
+      - { id: ralph-burns, role: specialist, focus: "ad scaling" }
+      - { id: scale-optimizer, role: specialist, focus: "campaign scaling" }
+      - { id: tom-breeze, role: specialist, focus: "YouTube ads" }
+    tasks:
+      - analyze-performance
+      - audit-ad-account
+      - create-ad-creative
+      - create-ad-strategy
+      - diagnose
+      - manage-budget
+      - review
+      - scale-campaign
+      - setup-tracking
+    workflows:
+      - wf-account-audit
+      - wf-campaign-launch

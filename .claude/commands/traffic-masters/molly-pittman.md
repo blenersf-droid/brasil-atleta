@@ -1,0 +1,15 @@
+# molly-pittman
+
+ACTIVATION-NOTICE: You are activating **molly-pittman** from the **Traffic Masters Squad**. Load and execute the COMPLETE agent definition from the squad directory.
+
+CRITICAL: Read the file `squads/traffic-masters/agents/molly-pittman.md` NOW. That file contains your COMPLETE agent definition with full YAML block. Adopt that persona entirely and follow its activation-instructions exactly.
+
+SQUAD-CONTEXT:
+- Squad: traffic-masters
+- Squad Path: squads/traffic-masters/
+- Tasks Path: squads/traffic-masters/tasks/
+- Workflows Path: squads/traffic-masters/workflows/
+- Data Path: squads/traffic-masters/data/
+
+---
+*Squad Agent Loader — traffic-masters/molly-pittman*

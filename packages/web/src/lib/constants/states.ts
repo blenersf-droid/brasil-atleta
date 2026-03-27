@@ -1,0 +1,32 @@
+export const BRAZILIAN_STATES = [
+  { uf: "AC", name: "Acre", region: "Norte" },
+  { uf: "AL", name: "Alagoas", region: "Nordeste" },
+  { uf: "AM", name: "Amazonas", region: "Norte" },
+  { uf: "AP", name: "Amapa", region: "Norte" },
+  { uf: "BA", name: "Bahia", region: "Nordeste" },
+  { uf: "CE", name: "Ceara", region: "Nordeste" },
+  { uf: "DF", name: "Distrito Federal", region: "Centro-Oeste" },
+  { uf: "ES", name: "Espirito Santo", region: "Sudeste" },
+  { uf: "GO", name: "Goias", region: "Centro-Oeste" },
+  { uf: "MA", name: "Maranhao", region: "Nordeste" },
+  { uf: "MG", name: "Minas Gerais", region: "Sudeste" },
+  { uf: "MS", name: "Mato Grosso do Sul", region: "Centro-Oeste" },
+  { uf: "MT", name: "Mato Grosso", region: "Centro-Oeste" },
+  { uf: "PA", name: "Para", region: "Norte" },
+  { uf: "PB", name: "Paraiba", region: "Nordeste" },
+  { uf: "PE", name: "Pernambuco", region: "Nordeste" },
+  { uf: "PI", name: "Piaui", region: "Nordeste" },
+  { uf: "PR", name: "Parana", region: "Sul" },
+  { uf: "RJ", name: "Rio de Janeiro", region: "Sudeste" },
+  { uf: "RN", name: "Rio Grande do Norte", region: "Nordeste" },
+  { uf: "RO", name: "Rondonia", region: "Norte" },
+  { uf: "RR", name: "Roraima", region: "Norte" },
+  { uf: "RS", name: "Rio Grande do Sul", region: "Sul" },
+  { uf: "SC", name: "Santa Catarina", region: "Sul" },
+  { uf: "SE", name: "Sergipe", region: "Nordeste" },
+  { uf: "SP", name: "Sao Paulo", region: "Sudeste" },
+  { uf: "TO", name: "Tocantins", region: "Norte" },
+] as const;
+
+export type BrazilianUF = (typeof BRAZILIAN_STATES)[number]["uf"];
+export type BrazilianRegion = (typeof BRAZILIAN_STATES)[number]["region"];
