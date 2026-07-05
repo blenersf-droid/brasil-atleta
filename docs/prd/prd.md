@@ -2,10 +2,12 @@
 
 **Version:** 1.0.0
 **Date:** 2026-03-26
-**Status:** Draft
+**Status:** Superseded
 **Origin:** Projeto academico FGV/FIFA/CIES - Gestao de Esportes (2026)
 **Authors:** Enzo Zucheran, Klaus Moraes, Matheus Torres, Haroldo Neto
 **Orientadora:** Prof. Monica Maeda Valentim
+
+> **⚠️ SUBSTITUÍDO** — Este documento foi substituído pelo [PRD v3](./prd-v3.md) em 2026-07-05. Mantido apenas como histórico.
 
 ---
 

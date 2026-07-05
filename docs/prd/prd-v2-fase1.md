@@ -2,8 +2,10 @@
 
 **Version:** 2.0.0
 **Date:** 2026-03-27
-**Status:** Active
+**Status:** Superseded
 **Pivot:** De plataforma institucional para produto comercial B2C/B2B
+
+> **⚠️ SUBSTITUÍDO** — Este documento foi substituído pelo [PRD v3](./prd-v3.md) em 2026-07-05. Mantido apenas como histórico.
 
 ---
 

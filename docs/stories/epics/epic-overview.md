@@ -3,6 +3,8 @@
 **Status:** Draft
 **Date:** 2026-03-26
 
+> **⚠️ DESATUALIZADO** — Este overview reflete o PRD v1 (institucional). O roadmap vigente está no [PRD v3](../../prd/prd-v3.md). Reorganização dos epics pendente.
+
 ---
 
 ## Fase 1: MVP — Fundacao (Epics 1-4)
