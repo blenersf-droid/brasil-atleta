@@ -54,11 +54,13 @@ const GENDER_LABELS: Record<Gender, string> = {
   NB: "Nao-binario",
 };
 
-function getModalityName(code: string): string {
+function getModalityName(code: string | null): string {
+  if (!code) return "Nao informada";
   return MODALITIES.find((m) => m.code === code)?.name ?? code;
 }
 
-function getStateName(uf: string): string {
+function getStateName(uf: string | null): string {
+  if (!uf) return "Nao informado";
   const found = BRAZILIAN_STATES.find((s) => s.uf === uf);
   return found ? `${found.name} (${uf})` : uf;
 }
@@ -72,7 +74,8 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return "Nao informada";
   try {
     const date = new Date(dateStr + "T00:00:00");
     return date.toLocaleDateString("pt-BR", {
@@ -99,7 +102,8 @@ function formatShortDate(dateStr: string | null): string {
   }
 }
 
-function calculateAge(birthDate: string): number {
+function calculateAge(birthDate: string | null): number | null {
+  if (!birthDate) return null;
   const today = new Date();
   const birth = new Date(birthDate + "T00:00:00");
   let age = today.getFullYear() - birth.getFullYear();
@@ -188,7 +192,17 @@ export default async function AthleteProfilePage({ params, searchParams }: Athle
     .eq("athlete_id", id)
     .order("assessment_date", { ascending: false });
 
-  const assessments = assessmentsRaw ?? [];
+  // AssessmentsTab expects non-null modality_code/protocol/metrics (its own
+  // local Assessment type predates these columns' real nullability — the
+  // `metrics` jsonb column is NOT NULL DEFAULT '{}' in the schema, but the
+  // generated Json type still allows a literal JSON "null" value) —
+  // normalize here rather than widen that shared component's contract.
+  const assessments = (assessmentsRaw ?? []).map((a) => ({
+    ...a,
+    modality_code: a.modality_code ?? "",
+    protocol: a.protocol ?? "",
+    metrics: (a.metrics ?? {}) as Record<string, unknown>,
+  }));
 
   // Fetch results with competition data
   const { data: resultsRaw } = await supabase
@@ -467,7 +481,8 @@ export default async function AthleteProfilePage({ params, searchParams }: Athle
             </div>
 
             <p className="text-sm text-muted-foreground">
-              {age} anos · {getStateName(athlete.state)}
+              {age !== null ? `${age} anos · ` : ""}
+              {getStateName(athlete.state)}
               {athlete.city ? `, ${athlete.city}` : ""}
             </p>
           </div>
@@ -483,7 +498,7 @@ export default async function AthleteProfilePage({ params, searchParams }: Athle
       </div>
 
       {/* KPI Cards */}
-      <KpiCards athleteId={athlete.id} modalityCode={athlete.primary_modality} />
+      <KpiCards athleteId={athlete.id} modalityCode={athlete.primary_modality ?? ""} />
 
       {/* Tabs */}
       <Tabs defaultValue="personal">
@@ -513,11 +528,14 @@ export default async function AthleteProfilePage({ params, searchParams }: Athle
                 />
                 <DataRow
                   label="Data de Nascimento"
-                  value={`${formatDate(athlete.birth_date)} (${age} anos)`}
+                  value={`${formatDate(athlete.birth_date)}${age !== null ? ` (${age} anos)` : ""}`}
                 />
                 <DataRow
                   label="Genero"
-                  value={GENDER_LABELS[athlete.gender as Gender] ?? athlete.gender}
+                  value={
+                    (athlete.gender && GENDER_LABELS[athlete.gender as Gender]) ??
+                    "Nao informado"
+                  }
                 />
                 <DataRow
                   label="Estado"
@@ -728,7 +746,7 @@ export default async function AthleteProfilePage({ params, searchParams }: Athle
         <TabsContent value="assessments" className="mt-4">
           <AssessmentsTab
             athleteId={athlete.id}
-            modalityCode={athlete.primary_modality}
+            modalityCode={athlete.primary_modality ?? ""}
             isParalympic={athlete.is_paralympic ?? false}
             assessments={assessments}
           />

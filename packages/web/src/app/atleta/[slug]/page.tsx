@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { MODALITIES } from "@/lib/constants/modalities";
 import { BRAZILIAN_STATES } from "@/lib/constants/states";
@@ -18,6 +17,8 @@ import {
   Activity,
   BarChart3,
   ChevronRight,
+  Lock,
+  Flag,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -169,11 +170,19 @@ export async function generateMetadata({
   const { slug } = await params;
   const supabase = await createClient();
 
-  const { data: athlete } = await supabase
+  const { data: athleteMetaRaw } = await supabase
     .from("athletes")
     .select("full_name, primary_modality, competitive_level, state, bio")
     .eq("slug", slug)
     .single();
+
+  const athlete = athleteMetaRaw as unknown as {
+    full_name: string;
+    primary_modality: string;
+    competitive_level: string;
+    state: string;
+    bio: string | null;
+  } | null;
 
   if (!athlete) {
     return {
@@ -220,7 +229,11 @@ export default async function AtletaPublicPage({ params }: Props) {
   const { slug } = await params;
   const supabase = await createClient();
 
-  // Fetch athlete by slug — anon read policy covers this
+  // Fetch athlete by slug — anon read policy covers this. RLS
+  // ("public_read_athletes", 00007_lgpd_minors.sql) already restricts this
+  // query to profile_visibility = 'public': a restricted profile and a slug
+  // that never existed both come back as "no row" here, indistinguishably —
+  // deliberate (see the empty-state below), not a bug.
   const { data: athleteRaw, error } = await supabase
     .from("athletes")
     .select(
@@ -230,7 +243,34 @@ export default async function AtletaPublicPage({ params }: Props) {
     .single();
 
   if (error || !athleteRaw) {
-    notFound();
+    // FR-0.8/D6: intentionally NOT next/navigation's notFound() — a private
+    // (restricted) profile and a slug that never existed are indistinguish-
+    // able at this point (RLS denies the row either way, see above), and we
+    // deliberately keep it that way: showing a different message for
+    // "private" vs "doesn't exist" would let a visitor confirm a private
+    // profile's slug is real (slug-enumeration leak). Both cases render this
+    // same elegant, non-leaking empty state instead of a bare 404.
+    return (
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 px-4 text-center">
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-[#0a1628]/[0.04]">
+          <Lock className="size-7 text-[#0a1628]/30" />
+        </div>
+        <div>
+          <h1 className="text-xl font-bold text-[#0a1628]">
+            Este perfil nao esta disponivel
+          </h1>
+          <p className="mt-1.5 max-w-sm text-sm text-[#0a1628]/50">
+            O perfil pode ser privado ou o link pode estar incorreto.
+          </p>
+        </div>
+        <Link
+          href="/"
+          className="mt-2 inline-flex items-center gap-1.5 rounded-xl bg-[#009739] px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#00b846]"
+        >
+          Voltar ao inicio
+        </Link>
+      </div>
+    );
   }
 
   const athlete = athleteRaw as unknown as AthleteRow;
@@ -603,6 +643,18 @@ export default async function AtletaPublicPage({ params }: Props) {
             </Link>
           </div>
         </section>
+
+        {/* Report channel (FR-0.9/D6) — discreet, always reachable even when
+            not logged in. */}
+        <div className="flex justify-center pb-2">
+          <Link
+            href={`/denunciar?atleta=${encodeURIComponent(slug)}`}
+            className="inline-flex items-center gap-1.5 text-xs text-gray-400 transition-colors hover:text-gray-600"
+          >
+            <Flag className="size-3" />
+            Denunciar perfil
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -56,11 +56,13 @@ const GRADE_BADGE: Record<CompetitiveLevel, { label: string; className: string }
   elite: { label: "Elite", className: "bg-amber-50 text-amber-700 border-amber-200" },
 };
 
-function getModalityName(code: string): string {
+function getModalityName(code: string | null): string {
+  if (!code) return "Nao informada";
   return MODALITIES.find((m) => m.code === code)?.name ?? code;
 }
 
-function getStateName(uf: string): string {
+function getStateName(uf: string | null): string {
+  if (!uf) return "Nao informado";
   return BRAZILIAN_STATES.find((s) => s.uf === uf)?.name ?? uf;
 }
 
@@ -262,11 +264,13 @@ export default async function DashboardPage() {
                       {comp.name}
                     </TableCell>
                     <TableCell className="font-mono text-sm text-[#0a1628]/60">
-                      {new Date(comp.date_start).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric",
-                      })}
+                      {comp.date_start
+                        ? new Date(comp.date_start).toLocaleDateString("pt-BR", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })
+                        : "—"}
                     </TableCell>
                     <TableCell>
                       <Badge

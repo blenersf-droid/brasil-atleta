@@ -32,17 +32,6 @@ export const registerSchema = z
         "Senha deve conter maiuscula, minuscula e numero"
       ),
     confirm_password: z.string().min(1, "Confirmacao de senha e obrigatoria"),
-    user_type: z.enum(
-      [
-        "admin_nacional",
-        "confederacao",
-        "federacao",
-        "clube",
-        "tecnico",
-        "atleta",
-      ],
-      { message: "Selecione o tipo de usuario" }
-    ),
     accept_terms: z.literal(true, {
       message: "Voce deve aceitar os termos de uso",
     }),
@@ -81,12 +70,3 @@ export const resetPasswordSchema = z
   });
 
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
-
-export const USER_TYPE_LABELS: Record<string, string> = {
-  admin_nacional: "Admin Nacional",
-  confederacao: "Confederacao",
-  federacao: "Federacao",
-  clube: "Clube / Centro de Treinamento",
-  tecnico: "Tecnico / Preparador Fisico",
-  atleta: "Atleta",
-};

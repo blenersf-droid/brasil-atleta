@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/roles";
 import { MODALITIES } from "@/lib/constants/modalities";
 import { BRAZILIAN_STATES } from "@/lib/constants/states";
-import type { Competition, CompetitiveLevel, Entity } from "@/types/database";
+import type { CompetitiveLevel, Entity } from "@/types/database";
 import { ExportButton } from "@/components/export/export-button";
 import {
   Table,
@@ -36,6 +36,11 @@ function getModalityName(code: string): string {
 
 function getStateName(uf: string): string {
   return BRAZILIAN_STATES.find((s) => s.uf === uf)?.name ?? uf;
+}
+
+const COMPETITIVE_LEVELS: CompetitiveLevel[] = ["school", "state", "national", "elite"];
+function isCompetitiveLevel(value: string): value is CompetitiveLevel {
+  return (COMPETITIVE_LEVELS as string[]).includes(value);
 }
 
 function formatDate(dateStr: string | null): string {
@@ -85,7 +90,7 @@ export default async function CompetitionsPage({ searchParams }: CompetitionsPag
   if (search) {
     query = query.ilike("name", `%${search}%`);
   }
-  if (grade) {
+  if (grade && isCompetitiveLevel(grade)) {
     query = query.eq("grade", grade);
   }
   if (modality) {
@@ -103,7 +108,7 @@ export default async function CompetitionsPage({ searchParams }: CompetitionsPag
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-  const competitionList: Competition[] = competitions ?? [];
+  const competitionList = competitions ?? [];
 
   // Fetch organizer names for competitions that have one
   const entityIds = competitionList

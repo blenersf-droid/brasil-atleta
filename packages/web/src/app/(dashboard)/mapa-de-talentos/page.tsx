@@ -2,7 +2,13 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/roles";
 import { MODALITIES } from "@/lib/constants/modalities";
+import type { CompetitiveLevel } from "@/types/database";
 import { TalentMapClient } from "./talent-map-client";
+
+const COMPETITIVE_LEVELS: CompetitiveLevel[] = ["school", "state", "national", "elite"];
+function isCompetitiveLevel(value: string): value is CompetitiveLevel {
+  return (COMPETITIVE_LEVELS as string[]).includes(value);
+}
 
 interface TalentMapPageProps {
   searchParams: Promise<{
@@ -27,7 +33,7 @@ export default async function TalentMapPage({ searchParams }: TalentMapPageProps
   if (modality) {
     athleteQuery = athleteQuery.eq("primary_modality", modality);
   }
-  if (level) {
+  if (level && isCompetitiveLevel(level)) {
     athleteQuery = athleteQuery.eq("competitive_level", level);
   }
 

@@ -28,13 +28,23 @@ export function useUserRole(): UserRoleState {
   useEffect(() => {
     const supabase = createClient();
 
+    // Role is server-controlled (public.user_roles), never trust
+    // user_metadata for this — it is fully client-writable.
+    async function fetchRole(userId: string): Promise<UserRole> {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .maybeSingle();
+      return data?.role ?? "atleta";
+    }
+
     async function loadUser() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        const role =
-          (user.user_metadata?.user_type as UserRole) || "atleta";
+        const role = await fetchRole(user.id);
         setState({
           role,
           entityId: user.user_metadata?.entity_id || null,
@@ -56,19 +66,17 @@ export function useUserRole(): UserRoleState {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        const role =
-          (session.user.user_metadata?.user_type as UserRole) || "atleta";
-        setState({
-          role,
-          entityId: session.user.user_metadata?.entity_id || null,
-          entityType: session.user.user_metadata?.entity_type || null,
-          fullName:
-            session.user.user_metadata?.full_name ||
-            session.user.email ||
-            "",
-          isLoading: false,
-          isAdmin: role === "admin_nacional",
-          isAuthenticated: true,
+        const user = session.user;
+        fetchRole(user.id).then((role) => {
+          setState({
+            role,
+            entityId: user.user_metadata?.entity_id || null,
+            entityType: user.user_metadata?.entity_type || null,
+            fullName: user.user_metadata?.full_name || user.email || "",
+            isLoading: false,
+            isAdmin: role === "admin_nacional",
+            isAuthenticated: true,
+          });
         });
       } else {
         setState({

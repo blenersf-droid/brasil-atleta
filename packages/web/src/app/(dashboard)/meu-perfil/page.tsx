@@ -19,6 +19,8 @@ import { AchievementsSection } from "./achievements-section";
 import { AddCompetitionDialog } from "./add-competition-dialog";
 import { AddResultDialog } from "./add-result-dialog";
 import { AddAssessmentDialog } from "./add-assessment-dialog";
+import { PrivacySection } from "./privacy-section";
+import { isMinor } from "@/lib/utils/age";
 import type { AchievementType } from "@/components/athletes/achievement-badge";
 
 const levelLabels: Record<string, string> = {
@@ -40,6 +42,15 @@ const statusLabels: Record<string, string> = {
   inactive: "Inativo",
   retired: "Aposentado",
 };
+
+// Extracted to a plain helper (instead of inlining Date.now() in the render
+// body) to satisfy the react-hooks/purity rule — same pattern already used
+// in packages/web/src/app/atleta/[slug]/page.tsx.
+function calculateAge(birthDate: string): number {
+  return Math.floor(
+    (Date.now() - new Date(birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+  );
+}
 
 export default async function MeuPerfilPage() {
   const supabase = await createClient();
@@ -106,17 +117,26 @@ export default async function MeuPerfilPage() {
     .order("date", { ascending: false })
     .limit(30);
 
+  // Privacy section (FR-0.8/FR-1.8/D6): a minor can only self-serve the
+  // public/restricted toggle once a guardian has registered a
+  // "public_profile" consent (see privacy-section.tsx /
+  // authorize-public-profile-dialog.tsx and the enforce_athlete_profile_
+  // visibility DB trigger in 00007_lgpd_minors.sql).
+  const isMinorAthlete = isMinor(athlete.birth_date);
+  const { data: publicProfileConsent } = await supabase
+    .from("guardian_consents")
+    .select("id")
+    .eq("athlete_id", athlete.id)
+    .eq("consent_type", "public_profile")
+    .limit(1)
+    .maybeSingle();
+
   const modalityName =
     MODALITIES.find((m) => m.code === athlete.primary_modality)?.name ||
     athlete.primary_modality ||
     "—";
 
-  const age = athlete.birth_date
-    ? Math.floor(
-        (Date.now() - new Date(athlete.birth_date).getTime()) /
-          (365.25 * 24 * 60 * 60 * 1000)
-      )
-    : null;
+  const age = athlete.birth_date ? calculateAge(athlete.birth_date) : null;
 
   // Profile completeness data
   const hasPhoto = !!athlete.photo_url;
@@ -252,6 +272,7 @@ export default async function MeuPerfilPage() {
           <TabsTrigger value="resultados">Meus Resultados</TabsTrigger>
           <TabsTrigger value="avaliacoes">Avaliacoes</TabsTrigger>
           <TabsTrigger value="dados">Dados Pessoais</TabsTrigger>
+          <TabsTrigger value="privacidade">Privacidade</TabsTrigger>
         </TabsList>
 
         {/* Results Tab */}
@@ -482,6 +503,16 @@ export default async function MeuPerfilPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Privacy Tab (FR-0.8/FR-1.8/D6) */}
+        <TabsContent value="privacidade" className="mt-4">
+          <PrivacySection
+            athleteId={athlete.id}
+            visibility={athlete.profile_visibility}
+            isMinorAthlete={isMinorAthlete}
+            hasPublicProfileConsent={!!publicProfileConsent}
+          />
         </TabsContent>
       </Tabs>
     </div>

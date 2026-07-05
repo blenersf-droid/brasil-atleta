@@ -32,9 +32,18 @@ export async function getSession() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
+
+  // Role is server-controlled (public.user_roles), never trust
+  // user_metadata for this — it is fully client-writable.
+  const { data: roleRow } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   return {
     user,
-    role: (user.user_metadata?.user_type as UserRole) || "atleta",
+    role: roleRow?.role || "atleta",
     entityId: user.user_metadata?.entity_id as string | undefined,
     entityType: user.user_metadata?.entity_type as string | undefined,
     fullName:

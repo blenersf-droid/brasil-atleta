@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/lib/database.types";
 import { cn } from "@/lib/utils";
 
 const COMMON_PROTOCOLS = [
@@ -120,7 +121,7 @@ export function CreateAssessmentDialog({
         {}
       );
 
-      const payload: Record<string, unknown> = {
+      const payload: Database["public"]["Tables"]["assessments"]["Insert"] = {
         athlete_id: athleteId,
         modality_code: modalityCode,
         assessment_date: data.assessment_date,

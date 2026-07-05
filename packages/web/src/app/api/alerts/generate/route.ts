@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/roles";
 import type { AlertType, AlertSeverity } from "@/types/database";
+import type { Json } from "@/lib/database.types";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -10,7 +11,7 @@ interface NewAlert {
   alert_type: AlertType;
   severity: AlertSeverity;
   description: string;
-  data: Record<string, unknown>;
+  data: Json;
   is_read: boolean;
 }
 

@@ -11,11 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import {
-  registerSchema,
-  RegisterFormData,
-  USER_TYPE_LABELS,
-} from "@/lib/validations/auth";
+import { registerSchema, RegisterFormData } from "@/lib/validations/auth";
 
 export default function CriarContaPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +34,6 @@ export default function CriarContaPage() {
         options: {
           data: {
             full_name: data.full_name,
-            user_type: data.user_type,
           },
         },
       });
@@ -252,34 +247,11 @@ export default function CriarContaPage() {
                 )}
               </div>
 
-              {/* User type */}
-              <div className="space-y-2">
-                <Label
-                  htmlFor="user_type"
-                  className="text-xs font-semibold text-[#0a1628]/60 uppercase tracking-wider"
-                >
-                  Tipo de Usuario
-                </Label>
-                <select
-                  id="user_type"
-                  className="h-11 w-full rounded-xl border border-[#0a1628]/[0.08] bg-white px-3 text-sm text-[#0a1628] focus:border-[#009739] focus:outline-none focus:ring-2 focus:ring-[#009739]/20 disabled:pointer-events-none disabled:opacity-50"
-                  {...register("user_type")}
-                >
-                  <option value="" disabled>
-                    Selecione o tipo de usuario
-                  </option>
-                  {Object.entries(USER_TYPE_LABELS).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-                {errors.user_type && (
-                  <p className="text-xs text-red-500 mt-1">
-                    {errors.user_type.message}
-                  </p>
-                )}
-              </div>
+              {/* Account type notice — self-signup is athlete-only */}
+              <p className="text-xs leading-relaxed text-[#0a1628]/35">
+                Este cadastro e para atletas. Para clubes, federacoes e outras
+                entidades: em breve.
+              </p>
 
               {/* Accept terms */}
               <div className="space-y-2">

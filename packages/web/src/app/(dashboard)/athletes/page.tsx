@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/auth/roles";
 import { MODALITIES } from "@/lib/constants/modalities";
 import { BRAZILIAN_STATES } from "@/lib/constants/states";
-import type { Athlete, CompetitiveLevel, AthleteStatus } from "@/types/database";
+import type { CompetitiveLevel, AthleteStatus } from "@/types/database";
 import { ExportButton } from "@/components/export/export-button";
 import {
   Table,
@@ -37,12 +37,24 @@ const STATUS_BADGE: Record<AthleteStatus, { label: string; className: string }> 
   retired: { label: "Aposentado", className: "bg-orange-100 text-orange-700 border-orange-200" },
 };
 
-function getModalityName(code: string): string {
+function getModalityName(code: string | null): string {
+  if (!code) return "Nao informada";
   return MODALITIES.find((m) => m.code === code)?.name ?? code;
 }
 
-function getStateName(uf: string): string {
+function getStateName(uf: string | null): string {
+  if (!uf) return "Nao informado";
   return BRAZILIAN_STATES.find((s) => s.uf === uf)?.name ?? uf;
+}
+
+const COMPETITIVE_LEVELS: CompetitiveLevel[] = ["school", "state", "national", "elite"];
+function isCompetitiveLevel(value: string): value is CompetitiveLevel {
+  return (COMPETITIVE_LEVELS as string[]).includes(value);
+}
+
+const ATHLETE_STATUSES: AthleteStatus[] = ["active", "inactive", "retired"];
+function isAthleteStatus(value: string): value is AthleteStatus {
+  return (ATHLETE_STATUSES as string[]).includes(value);
 }
 
 function getInitials(name: string): string {
@@ -110,13 +122,13 @@ export default async function AthletesPage({ searchParams }: AthletesPageProps) 
   if (modality) {
     query = query.eq("primary_modality", modality);
   }
-  if (level) {
+  if (level && isCompetitiveLevel(level)) {
     query = query.eq("competitive_level", level);
   }
   if (state) {
     query = query.eq("state", state);
   }
-  if (status) {
+  if (status && isAthleteStatus(status)) {
     query = query.eq("status", status);
   }
 
@@ -128,7 +140,7 @@ export default async function AthletesPage({ searchParams }: AthletesPageProps) 
 
   const totalCount = count ?? 0;
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-  const athleteList: Athlete[] = athletes ?? [];
+  const athleteList = athletes ?? [];
 
   const buildPageUrl = (p: number) => {
     const sp = new URLSearchParams();
@@ -171,7 +183,9 @@ export default async function AthletesPage({ searchParams }: AthletesPageProps) 
           data={athleteList.map((a) => ({
             nome: a.full_name,
             modalidade: getModalityName(a.primary_modality),
-            nivel: LEVEL_BADGE[a.competitive_level]?.label ?? a.competitive_level,
+            nivel: a.competitive_level
+              ? LEVEL_BADGE[a.competitive_level]?.label ?? a.competitive_level
+              : "Nao informado",
             estado: getStateName(a.state),
             entidade: a.current_entity_id ?? "",
             status: STATUS_BADGE[a.status]?.label ?? a.status,
@@ -204,7 +218,9 @@ export default async function AthletesPage({ searchParams }: AthletesPageProps) 
               </TableRow>
             ) : (
               athleteList.map((athlete) => {
-                const levelBadge = LEVEL_BADGE[athlete.competitive_level];
+                const levelBadge = athlete.competitive_level
+                  ? LEVEL_BADGE[athlete.competitive_level]
+                  : null;
                 const statusBadge = STATUS_BADGE[athlete.status];
                 const initials = getInitials(athlete.full_name);
                 const avatarColor = getAvatarColor(athlete.full_name);
@@ -247,12 +263,16 @@ export default async function AthletesPage({ searchParams }: AthletesPageProps) 
 
                     {/* Level Badge */}
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={cn("text-xs font-medium border", levelBadge.className)}
-                      >
-                        {levelBadge.label}
-                      </Badge>
+                      {levelBadge ? (
+                        <Badge
+                          variant="outline"
+                          className={cn("text-xs font-medium border", levelBadge.className)}
+                        >
+                          {levelBadge.label}
+                        </Badge>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
 
                     {/* State */}

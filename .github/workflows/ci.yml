@@ -59,3 +59,34 @@ jobs:
       - name: ESLint
         working-directory: packages/web
         run: npx next lint
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: packages/web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: packages/web
+        run: npm ci
+
+      - name: Run unit tests (vitest)
+        working-directory: packages/web
+        run: npm test
+
+  rls-tests:
+    name: RLS Tests (Postgres/PostGIS)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run RLS test harness
+        run: bash supabase/tests/rls/run.sh

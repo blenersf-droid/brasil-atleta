@@ -1,120 +1,22 @@
 -- =============================================================================
 -- Brasil Atleta — Seed Data
--- Description: Olympic sport modality codes, Brazilian UFs, and sample entity hierarchy
+-- Description: Sample entity hierarchy (COB > Confederacoes > Federacoes)
+--
+-- FR-0.6 note: this file used to also CREATE TABLE + INSERT into `modalities`
+-- and `brazilian_ufs`. Those tables are NOT part of any migration (00001/00002)
+-- and are NOT queried anywhere in packages/web/src (grep confirmed zero
+-- `.from("modalities")` / `.from("brazilian_ufs")` calls). The app instead uses
+-- hardcoded frontend constants (MODALITIES in
+-- packages/web/src/lib/constants/modalities.ts, BRAZILIAN_STATES in
+-- packages/web/src/lib/constants/states.ts) whose codes/labels do not even
+-- match the removed seed rows one-to-one. Defining schema (CREATE TABLE) in a
+-- seed file is also not aligned with the migration-based schema convention
+-- used elsewhere in this repo. Decision: removed both reference tables from
+-- the seed instead of promoting them to a migration (option b) — they were
+-- dead weight, not real dependencies of the app. The `entities` table below
+-- IS consumed by the app (e.g. packages/web/src/app/(dashboard)/meu-perfil/
+-- page.tsx reads from `entities`), so this sample hierarchy is kept as-is.
 -- =============================================================================
-
--- =============================================================================
--- REFERENCE TABLE: modalities
--- Olympic sport modality codes (recognized by COB / COI)
--- =============================================================================
-
-CREATE TABLE IF NOT EXISTS modalities (
-    code        text PRIMARY KEY,
-    name        text NOT NULL,
-    name_en     text,
-    category    text,   -- 'olympic', 'paralympic', 'both'
-    is_team     boolean NOT NULL DEFAULT false
-);
-
-INSERT INTO modalities (code, name, name_en, category, is_team) VALUES
--- Individual / Track & Field
-('ATL',  'Atletismo',                         'Athletics',               'both',      false),
-('NAT',  'Natacao',                            'Swimming',                'both',      false),
-('JUD',  'Judo',                               'Judo',                    'both',      false),
-('BOX',  'Boxe',                               'Boxing',                  'olympic',   false),
-('TEN',  'Tenis',                              'Tennis',                  'olympic',   false),
-('HAL',  'Halterofilismo',                    'Weightlifting',           'both',      false),
-('LUT',  'Luta',                               'Wrestling',               'olympic',   false),
-('ESG',  'Esgrima',                            'Fencing',                 'olympic',   false),
-('TIR',  'Tiro Esportivo',                    'Shooting',                'olympic',   false),
-('HIP',  'Hipismo',                            'Equestrian',              'olympic',   false),
-('PEN',  'Pentatlo Moderno',                  'Modern Pentathlon',       'olympic',   false),
-('TAE',  'Taekwondo',                          'Taekwondo',               'both',      false),
-('LPE',  'Levantamento de Peso',              'Weightlifting / ParaPower','both',     false),
-('BDM',  'Badminton',                          'Badminton',               'olympic',   false),
-('CAR',  'Carate',                             'Karate',                  'olympic',   false),
-('BRE',  'Breaking',                           'Breaking',                'olympic',   false),
-('SUR',  'Surfe',                              'Surfing',                 'olympic',   false),
-('ESC',  'Escalada Esportiva',                'Sport Climbing',          'olympic',   false),
-('SKA',  'Skate',                              'Skateboarding',           'olympic',   false),
-('TRM',  'Triatlo',                            'Triathlon',               'olympic',   false),
-('MAR',  'Marcha Atletica',                   'Race Walk',               'olympic',   false),
-('GAR',  'Ginastica Artistica',               'Artistic Gymnastics',     'olympic',   false),
-('GIR',  'Ginastica Ritmica',                 'Rhythmic Gymnastics',     'olympic',   false),
-('GTR',  'Ginastica de Trampolim',            'Trampoline Gymnastics',   'olympic',   false),
-('CAN',  'Canoagem',                           'Canoe / Kayak',           'olympic',   false),
-('VEL',  'Vela',                               'Sailing',                 'olympic',   false),
-('CIC',  'Ciclismo',                           'Cycling',                 'olympic',   false),
-('TRA',  'Tiro com Arco',                     'Archery',                 'both',      false),
-('BIA',  'Biatlo',                             'Biathlon',                'olympic',   false),
-('TIE',  'Tiro com Espingarda',               'Rifle Shooting',          'olympic',   false),
--- Team sports
-('FUT',  'Futebol',                            'Football (Soccer)',       'olympic',   true),
-('BAS',  'Basquetebol',                        'Basketball',              'olympic',   true),
-('VOL',  'Voleibol',                           'Volleyball',              'olympic',   true),
-('HAN',  'Handebol',                           'Handball',                'olympic',   true),
-('HOC',  'Hoquei sobre Grama',                'Field Hockey',            'olympic',   true),
-('RUG',  'Rugby Sevens',                       'Rugby Sevens',            'olympic',   true),
-('POL',  'Polo Aquatico',                     'Water Polo',              'olympic',   true),
-('SOF',  'Softball',                           'Softball',                'olympic',   true),
-('BEI',  'Beisebol',                           'Baseball',                'olympic',   true),
-('GOL',  'Golfe',                              'Golf',                    'olympic',   false),
-('LAC',  'Lacrosse',                           'Lacrosse',                'olympic',   true),
-('SQU',  'Squash',                             'Squash',                  'olympic',   false),
-('CRI',  'Criquet',                            'Cricket',                 'olympic',   true),
-('FLAG', 'Flag Football',                      'Flag Football',           'olympic',   true),
-('FLA',  'Floorball',                          'Floorball',               'olympic',   true),
-('CUR',  'Curling',                            'Curling',                 'olympic',   true),
--- Rowing / Aquatics
-('REI',  'Remo',                               'Rowing',                  'olympic',   false),
-('MAG',  'Maraton Aquatica',                  'Open Water Swimming',     'olympic',   false),
-('SIN',  'Nado Sincronizado',                 'Artistic Swimming',       'olympic',   false),
-('SAL',  'Saltos Ornamentais',                'Diving',                   'olympic',   false);
-
--- =============================================================================
--- REFERENCE TABLE: brazilian_ufs
--- All 27 Brazilian Federated Units (26 states + DF)
--- =============================================================================
-
-CREATE TABLE IF NOT EXISTS brazilian_ufs (
-    code        char(2)  PRIMARY KEY,
-    name        text     NOT NULL,
-    region      text     NOT NULL
-);
-
-INSERT INTO brazilian_ufs (code, name, region) VALUES
--- Norte
-('AC', 'Acre',               'Norte'),
-('AP', 'Amapa',              'Norte'),
-('AM', 'Amazonas',           'Norte'),
-('PA', 'Para',               'Norte'),
-('RO', 'Rondonia',           'Norte'),
-('RR', 'Roraima',            'Norte'),
-('TO', 'Tocantins',          'Norte'),
--- Nordeste
-('AL', 'Alagoas',            'Nordeste'),
-('BA', 'Bahia',              'Nordeste'),
-('CE', 'Ceara',              'Nordeste'),
-('MA', 'Maranhao',           'Nordeste'),
-('PB', 'Paraiba',            'Nordeste'),
-('PE', 'Pernambuco',         'Nordeste'),
-('PI', 'Piaui',              'Nordeste'),
-('RN', 'Rio Grande do Norte','Nordeste'),
-('SE', 'Sergipe',            'Nordeste'),
--- Centro-Oeste
-('DF', 'Distrito Federal',   'Centro-Oeste'),
-('GO', 'Goias',              'Centro-Oeste'),
-('MT', 'Mato Grosso',        'Centro-Oeste'),
-('MS', 'Mato Grosso do Sul', 'Centro-Oeste'),
--- Sudeste
-('ES', 'Espirito Santo',     'Sudeste'),
-('MG', 'Minas Gerais',       'Sudeste'),
-('RJ', 'Rio de Janeiro',     'Sudeste'),
-('SP', 'Sao Paulo',          'Sudeste'),
--- Sul
-('PR', 'Parana',             'Sul'),
-('RS', 'Rio Grande do Sul',  'Sul'),
-('SC', 'Santa Catarina',     'Sul');
 
 -- =============================================================================
 -- SAMPLE ENTITY HIERARCHY

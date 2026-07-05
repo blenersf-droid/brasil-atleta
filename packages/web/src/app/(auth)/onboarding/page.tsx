@@ -8,10 +8,17 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { WizardSteps } from "@/components/onboarding/wizard-steps";
 import { createClient } from "@/lib/supabase/client";
 import { BRAZILIAN_STATES } from "@/lib/constants/states";
 import { MODALITIES } from "@/lib/constants/modalities";
+import { isMinor } from "@/lib/utils/age";
+import type { Gender, CompetitiveLevel, EntityType } from "@/types/database";
+import type { Database } from "@/lib/database.types";
+
+type GuardianRelationship =
+  Database["public"]["Enums"]["guardian_relationship_type"];
 
 // ─── Type definitions ────────────────────────────────────────────────────────
 
@@ -38,6 +45,11 @@ interface FormData {
   // Confederacao contact
   contact_email?: string;
   contact_phone?: string;
+  // Atleta menor de idade — consentimento do responsavel (LGPD art. 14, D6)
+  guardian_full_name?: string;
+  guardian_email?: string;
+  guardian_relationship?: GuardianRelationship;
+  guardian_consent_checked?: boolean;
 }
 
 // ─── Step configurations by user type ─────────────────────────────────────────
@@ -48,6 +60,40 @@ const STEP_LABELS: Record<UserType, string[]> = {
   atleta: ["Dados Pessoais", "Modalidade", "Entidade Atual", "Conclusao"],
   federacao: ["Atuacao", "Conclusao"],
   confederacao: ["Informacoes", "Conclusao"],
+};
+
+// ─── Schema mapping helpers ────────────────────────────────────────────────────
+// The wizard collects Portuguese-language picklist values that do not map
+// 1:1 to the underlying schema enum vocabularies. These translate collected
+// answers into valid column values (see supabase/migrations/00001_initial_
+// schema.sql for gender_type/competitive_level, 00005_schema_reconciliation
+// .sql for the athletes/entities columns used below).
+
+const GENDER_MAP: Record<string, Gender> = {
+  masculino: "M",
+  feminino: "F",
+  nao_binario: "NB",
+};
+
+const COMPETITION_LEVEL_MAP: Record<string, CompetitiveLevel> = {
+  iniciante: "school",
+  regional: "state",
+  estadual: "state",
+  nacional: "national",
+  internacional: "elite",
+  paralimpico: "elite",
+};
+
+const ENTITY_TYPE_MAP: Record<"clube" | "federacao" | "confederacao", EntityType> = {
+  clube: "club",
+  federacao: "federation",
+  confederacao: "confederation",
+};
+
+const ENTITY_TYPE_LABEL: Record<"clube" | "federacao" | "confederacao", string> = {
+  clube: "Clube",
+  federacao: "Federacao",
+  confederacao: "Confederacao",
 };
 
 // ─── Reusable field components ────────────────────────────────────────────────
@@ -453,6 +499,107 @@ function AtletaStep3({
   );
 }
 
+// Shown only when the birth date informed in AtletaStep1 indicates the
+// athlete is under 18 (LGPD art. 14 / D6, FR-0.7). Captures a verifiable
+// consent from the legal guardian before the onboarding can be concluded —
+// see handleFinish, which blocks submission for minors until these fields
+// (and the checkbox) are filled.
+function GuardianConsentStep({
+  data,
+  onChange,
+}: {
+  data: FormData;
+  onChange: (d: Partial<FormData>) => void;
+}) {
+  return (
+    <div className="space-y-5">
+      <div className="rounded-xl border border-[#009739]/20 bg-[#009739]/[0.06] p-4">
+        <p className="text-sm font-bold text-[#0a1628]">
+          Autorizacao do responsavel legal
+        </p>
+        <p className="mt-1.5 text-xs leading-relaxed text-[#0a1628]/60">
+          Como o atleta e menor de 18 anos, a lei (LGPD, art. 14) exige a
+          autorizacao de um dos pais ou responsavel legal para o tratamento
+          dos dados dele. Vamos usar o nome, data de nascimento, modalidade e
+          resultados esportivos informados nesta pagina para criar o
+          portfolio do atleta. O perfil comeca privado (visibilidade
+          restrita) — so um responsavel podera torna-lo publico depois, em
+          &quot;Meu Perfil&quot;.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="guardian_full_name" className={labelClass}>
+          Nome completo do responsavel
+        </Label>
+        <Input
+          id="guardian_full_name"
+          type="text"
+          placeholder="Nome completo de um dos pais ou responsavel legal"
+          value={data.guardian_full_name ?? ""}
+          onChange={(e) => onChange({ guardian_full_name: e.target.value })}
+          className={inputClass}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="guardian_email" className={labelClass}>
+          E-mail do responsavel
+        </Label>
+        <Input
+          id="guardian_email"
+          type="email"
+          placeholder="email@exemplo.com"
+          value={data.guardian_email ?? ""}
+          onChange={(e) => onChange({ guardian_email: e.target.value })}
+          className={inputClass}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="guardian_relationship" className={labelClass}>
+          Relacao com o atleta
+        </Label>
+        <select
+          id="guardian_relationship"
+          value={data.guardian_relationship ?? ""}
+          onChange={(e) =>
+            onChange({
+              guardian_relationship: e.target.value as GuardianRelationship,
+            })
+          }
+          className={selectClass}
+        >
+          <option value="" disabled>
+            Selecione a relacao
+          </option>
+          <option value="mae">Mae</option>
+          <option value="pai">Pai</option>
+          <option value="tutor">Tutor(a) legal</option>
+          <option value="outro">Outro responsavel legal</option>
+        </select>
+      </div>
+
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border-2 border-[#009739] bg-[#009739]/[0.06] p-4">
+        <Checkbox
+          checked={!!data.guardian_consent_checked}
+          onCheckedChange={(checked) =>
+            onChange({ guardian_consent_checked: checked === true })
+          }
+          className="mt-0.5"
+        />
+        <span className="text-sm font-semibold leading-relaxed text-[#0a1628]">
+          Eu, na qualidade de responsavel legal, autorizo o tratamento dos
+          dados esportivos do atleta acima (nome, data de nascimento,
+          modalidade, resultados e conquistas) pela Brasil Atleta, para a
+          criacao do portfolio esportivo do atleta na plataforma, nos termos
+          da LGPD (art. 14).
+        </span>
+      </label>
+    </div>
+  );
+}
+
 function FederacaoStep1({
   data,
   onChange,
@@ -593,7 +740,7 @@ function ConclusaoStep({ userType }: { userType: UserType }) {
 
 // ─── Step registry ─────────────────────────────────────────────────────────────
 
-function getSteps(userType: UserType) {
+function getSteps(userType: UserType, data: FormData) {
   const steps: {
     label: string;
     component: (data: FormData, onChange: (d: Partial<FormData>) => void) => React.ReactNode;
@@ -638,6 +785,18 @@ function getSteps(userType: UserType) {
       label: "Entidade Atual",
       component: (data, onChange) => <AtletaStep3 data={data} onChange={onChange} />,
     });
+    // FR-0.7/D6: inserted only for a minor athlete (conservative default:
+    // unknown birth_date also counts as minor — see isMinor()), before the
+    // final "Conclusao" step. handleFinish blocks submission until this
+    // step's fields + checkbox are filled.
+    if (isMinor(data.birth_date)) {
+      steps.push({
+        label: "Consentimento",
+        component: (data, onChange) => (
+          <GuardianConsentStep data={data} onChange={onChange} />
+        ),
+      });
+    }
     steps.push({
       label: "Conclusao",
       component: () => <ConclusaoStep userType="atleta" />,
@@ -688,6 +847,19 @@ export default function OnboardingPage() {
     loadUser();
   }, []);
 
+  // Computed before the loading-state early return below (rules of hooks —
+  // the clamp effect that depends on its length must run unconditionally).
+  const steps = userType ? getSteps(userType, formData) : [];
+
+  // FR-0.7/D6: the atleta step list gains/loses the "Consentimento" step as
+  // birth_date crosses the minor/adult boundary (see getSteps). If that
+  // shrinks the list while currentStep pointed past the new end (e.g. user
+  // went back to step 1 and changed birth_date after having moved forward),
+  // clamp so the wizard never renders past the last step.
+  useEffect(() => {
+    setCurrentStep((s) => Math.min(s, Math.max(0, steps.length - 1)));
+  }, [steps.length]);
+
   function handleChange(partial: Partial<FormData>) {
     setFormData((prev) => ({ ...prev, ...partial }));
   }
@@ -706,38 +878,109 @@ export default function OnboardingPage() {
         return;
       }
 
+      if (!userType) {
+        // Defensive guard: the "Concluir" button is only reachable once
+        // userType has loaded (see the loading-state early return below),
+        // but that temporal guarantee isn't visible to the type checker here.
+        toast.error("Erro ao salvar dados. Tente novamente.");
+        return;
+      }
+
+      const fullName =
+        (user.user_metadata?.full_name as string | undefined) || user.email || "";
+
       if (userType === "atleta") {
-        await supabase.from("athletes").insert({
-          user_id: user.id,
-          birth_date: formData.birth_date ?? null,
-          gender: formData.gender ?? null,
-          state: formData.state ?? null,
-          city: formData.city ?? null,
-          primary_modality: formData.modality ?? null,
-          competition_level: formData.competition_level ?? null,
-          current_entity: formData.current_entity ?? null,
-        });
+        // FR-0.7/D6: a minor athlete cannot conclude onboarding without a
+        // verifiable guardian consent — block here (in addition to the
+        // "Consentimento" step only being reachable/shown for minors, see
+        // getSteps) so a submit triggered before the checkbox/fields are
+        // filled never reaches the insert below.
+        const athleteIsMinor = isMinor(formData.birth_date);
+        if (athleteIsMinor) {
+          const guardianEmailValid = /\S+@\S+\.\S+/.test(
+            formData.guardian_email ?? ""
+          );
+          const consentComplete =
+            !!formData.guardian_full_name?.trim() &&
+            guardianEmailValid &&
+            !!formData.guardian_relationship &&
+            formData.guardian_consent_checked === true;
+
+          if (!consentComplete) {
+            toast.error(
+              "Para concluir o cadastro de um atleta menor de idade, preencha os dados do responsavel e confirme a autorizacao."
+            );
+            return;
+          }
+        }
+
+        // NOTE: formData.current_entity is a free-text club name typed by the
+        // athlete in this step; athletes.current_entity_id is a uuid FK and
+        // there is no entity search/lookup here to resolve one from the
+        // other, so it is intentionally not persisted (schema-vs-code
+        // decision — see orchestrator report).
+        const { data: insertedAthlete, error: athleteError } = await supabase
+          .from("athletes")
+          .insert({
+            user_id: user.id,
+            full_name: fullName,
+            birth_date: formData.birth_date ?? null,
+            gender: formData.gender ? GENDER_MAP[formData.gender] ?? null : null,
+            state: formData.state ?? null,
+            city: formData.city ?? null,
+            primary_modality: formData.modality ?? null,
+            competitive_level: formData.competition_level
+              ? COMPETITION_LEVEL_MAP[formData.competition_level] ?? null
+              : null,
+          })
+          .select("id")
+          .single();
+
+        if (athleteError) throw athleteError;
+
+        // The guardian consent row can only be inserted once the athlete
+        // row exists (guardian_consents.athlete_id FKs to athletes.id) —
+        // profile_visibility itself is already forced to 'restricted' by the
+        // BEFORE INSERT DB trigger regardless of this insert succeeding.
+        if (athleteIsMinor && insertedAthlete) {
+          const { error: consentError } = await supabase
+            .from("guardian_consents")
+            .insert({
+              athlete_id: insertedAthlete.id,
+              guardian_full_name: formData.guardian_full_name!.trim(),
+              guardian_email: formData.guardian_email!.trim(),
+              guardian_relationship: formData.guardian_relationship!,
+              consent_type: "account",
+            });
+
+          if (consentError) throw consentError;
+        }
       } else if (userType === "tecnico") {
+        // NOTE: formData.linked_entity is a free-text entity name;
+        // coaches.entity_id is a uuid FK with no lookup step here, so it is
+        // intentionally not persisted (same rationale as current_entity above).
         await supabase.from("coaches").insert({
           user_id: user.id,
+          full_name: fullName,
           specialization: formData.specialization ?? null,
-          education: formData.education ?? null,
-          primary_modality: formData.modality ?? null,
-          linked_entity: formData.linked_entity ?? null,
+          academic_background: formData.education ?? null,
+          modalities: formData.modality ? [formData.modality] : [],
         });
       } else {
         // clube, federacao, confederacao
+        // NOTE: the current `entities` schema has no column linking an
+        // entity to the user who registered it, and no contact_email/
+        // contact_phone/subtype columns — those fields are collected by the
+        // wizard but not persisted here (schema gap — see orchestrator
+        // report; entity self-registration also has no RLS INSERT policy
+        // today, so this insert is rejected regardless).
         await supabase.from("entities").insert({
-          user_id: user.id,
-          name: formData.entity_name ?? null,
-          type: userType,
-          entity_subtype: formData.entity_type ?? null,
+          name: formData.entity_name || ENTITY_TYPE_LABEL[userType],
+          type: ENTITY_TYPE_MAP[userType],
           state: formData.state ?? null,
           city: formData.city ?? null,
-          modality: formData.modality ?? null,
-          modalities: formData.modalities ?? [],
-          contact_email: formData.contact_email ?? null,
-          contact_phone: formData.contact_phone ?? null,
+          modalities:
+            formData.modalities ?? (formData.modality ? [formData.modality] : []),
         });
       }
 
@@ -768,7 +1011,6 @@ export default function OnboardingPage() {
     );
   }
 
-  const steps = getSteps(userType);
   const stepLabels = steps.map((s) => s.label);
   const totalSteps = steps.length;
   const isLastStep = currentStep === totalSteps - 1;

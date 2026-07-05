@@ -38,6 +38,11 @@ const ENTITY_TYPE_COLORS: Record<EntityType, string> = {
   committee: "bg-red-50 text-red-700 border-red-200",
 };
 
+const ENTITY_TYPES = Object.keys(ENTITY_TYPE_LABELS) as EntityType[];
+function isEntityType(value: string): value is EntityType {
+  return (ENTITY_TYPES as string[]).includes(value);
+}
+
 interface SearchParams {
   search?: string;
   type?: string;
@@ -71,7 +76,7 @@ export default async function EntitiesPage({
   if (search) {
     query = query.ilike("name", `%${search}%`);
   }
-  if (typeFilter && typeFilter !== "all") {
+  if (typeFilter && typeFilter !== "all" && isEntityType(typeFilter)) {
     query = query.eq("type", typeFilter);
   }
   if (stateFilter && stateFilter !== "all") {
