@@ -376,8 +376,15 @@ ALTER TABLE media            ENABLE ROW LEVEL SECURITY;
 -- ---------------------------------------------------------------------------
 -- Helper: check admin role
 -- Uses app_metadata claim set by Supabase Auth hooks or edge functions
+--
+-- Lives in `public` (not `auth`): the `auth` schema is managed by Supabase
+-- itself — on the hosted project the connecting role is not permitted to
+-- create or alter any object inside `auth` (verified against the hosted
+-- database's actual grants), so application-defined functions must live in
+-- `public` instead. Rewritten in 00003_secure_roles.sql to read from
+-- public.get_user_role()/public.user_roles instead of the JWT claim below.
 -- ---------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION auth.is_admin()
+CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean AS $$
     SELECT COALESCE(
         (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin',
@@ -391,7 +398,7 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER;
 -- Admin sees all
 CREATE POLICY "admin_read_entities"
     ON entities FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Authenticated users can read all entities (public reference data)
 CREATE POLICY "authenticated_read_entities"
@@ -402,8 +409,8 @@ CREATE POLICY "authenticated_read_entities"
 -- Only admin can insert/update/delete entities
 CREATE POLICY "admin_write_entities"
     ON entities FOR ALL
-    USING (auth.is_admin())
-    WITH CHECK (auth.is_admin());
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
 
 -- ---------------------------------------------------------------------------
 -- POLICY: athletes
@@ -411,7 +418,7 @@ CREATE POLICY "admin_write_entities"
 -- Admin sees all athletes
 CREATE POLICY "admin_read_athletes"
     ON athletes FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read their own profile
 CREATE POLICY "athlete_read_own"
@@ -465,7 +472,7 @@ CREATE POLICY "entity_read_own_athletes"
 -- Admin sees all coaches
 CREATE POLICY "admin_read_coaches"
     ON coaches FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Coach can read their own record
 CREATE POLICY "coach_read_own"
@@ -496,7 +503,7 @@ CREATE POLICY "entity_read_own_coaches"
 -- Admin sees all
 CREATE POLICY "admin_read_athlete_entities"
     ON athlete_entities FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read their own history
 CREATE POLICY "athlete_read_own_athlete_entities"
@@ -534,8 +541,8 @@ CREATE POLICY "authenticated_read_competitions"
 -- Only admin can create/update/delete competitions
 CREATE POLICY "admin_write_competitions"
     ON competitions FOR ALL
-    USING (auth.is_admin())
-    WITH CHECK (auth.is_admin());
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
 
 -- ---------------------------------------------------------------------------
 -- POLICY: results
@@ -543,7 +550,7 @@ CREATE POLICY "admin_write_competitions"
 -- Admin sees all results
 CREATE POLICY "admin_read_results"
     ON results FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read their own results
 CREATE POLICY "athlete_read_own_results"
@@ -588,7 +595,7 @@ CREATE POLICY "entity_read_results"
 -- Admin sees all assessments
 CREATE POLICY "admin_read_assessments"
     ON assessments FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read their own assessments
 CREATE POLICY "athlete_read_own_assessments"
@@ -620,7 +627,7 @@ CREATE POLICY "coach_read_assessments"
 -- Admin sees all KPIs
 CREATE POLICY "admin_read_performance_kpis"
     ON performance_kpis FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read their own KPIs
 CREATE POLICY "athlete_read_own_performance_kpis"
@@ -650,7 +657,7 @@ CREATE POLICY "coach_read_performance_kpis"
 -- Admin sees all alerts
 CREATE POLICY "admin_read_scouting_alerts"
     ON scouting_alerts FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read alerts about themselves
 CREATE POLICY "athlete_read_own_scouting_alerts"
@@ -690,7 +697,7 @@ CREATE POLICY "entity_read_scouting_alerts"
 -- Admin sees all media
 CREATE POLICY "admin_read_media"
     ON media FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete can read their own media
 CREATE POLICY "athlete_read_own_media"

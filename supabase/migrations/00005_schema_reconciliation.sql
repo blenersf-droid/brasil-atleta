@@ -37,7 +37,7 @@
 -- queries `public.coaches` directly. SECURITY DEFINER functions execute with
 -- the privileges of their owner (the migration role, which bypasses RLS in
 -- Supabase), so the query inside never re-enters `coaches` RLS — no recursion.
--- Same pattern already used by `auth.is_admin()` / `public.get_user_role()`.
+-- Same pattern already used by `public.is_admin()` / `public.get_user_role()`.
 -- ---------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION public.get_coach_entity_id()

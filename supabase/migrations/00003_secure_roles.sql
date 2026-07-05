@@ -4,7 +4,7 @@
 -- Description: Fixes privilege-escalation via client-controlled user_metadata.
 --   Introduces public.user_roles as the sole source of truth for user roles,
 --   defaulted to 'atleta' by a trigger on signup, writable only by
---   service_role. Rewrites get_user_role()/auth.is_admin() to read from this
+--   service_role. Rewrites get_user_role()/public.is_admin() to read from this
 --   table instead of trusting values sent by the client (JWT / user_metadata
 --   / app_metadata).
 -- =============================================================================
@@ -109,13 +109,15 @@ $$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;
 COMMENT ON FUNCTION public.get_user_role IS 'Returns the authenticated user role from public.user_roles (server-controlled). No longer reads JWT/user_metadata.';
 
 -- ---------------------------------------------------------------------------
--- FUNCTION: auth.is_admin() — now backed by public.get_user_role() instead of
--- auth.jwt() -> app_metadata (previous definition lived in
+-- FUNCTION: public.is_admin() — now backed by public.get_user_role() instead
+-- of auth.jwt() -> app_metadata (previous definition lived in
 -- 00001_initial_schema.sql), so the 00001 admin_* policies are enforced
 -- against the same server-controlled source of truth instead of any JWT
--- claim.
+-- claim. Kept in `public` (see 00001's comment on public.is_admin()) rather
+-- than `auth` — the `auth` schema is Supabase-managed and the hosted
+-- project's connecting role cannot create/alter objects inside it.
 -- ---------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION auth.is_admin()
+CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS boolean AS $$
     SELECT public.get_user_role() = 'admin_nacional';
 $$ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public;

@@ -60,7 +60,7 @@ ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
 -- Admin sees all achievements (pattern: admin_read_* in 00001)
 CREATE POLICY "admin_read_achievements"
     ON achievements FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Achievements are shown on the public athlete profile (/atleta/[slug], Story 11.4 AC 5)
 -- so, unlike results/assessments, they are publicly readable (no TO clause = all roles,

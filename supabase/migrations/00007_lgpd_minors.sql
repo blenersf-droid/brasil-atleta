@@ -120,7 +120,7 @@ ALTER TABLE public.guardian_consents ENABLE ROW LEVEL SECURITY;
 -- every other table in 00001/00004.
 CREATE POLICY "admin_read_guardian_consents"
     ON public.guardian_consents FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- Athlete reads their own consent history.
 CREATE POLICY "athlete_read_own_guardian_consents"
@@ -288,7 +288,7 @@ CREATE POLICY "anyone_insert_abuse_reports"
 -- Only admin can review submitted reports.
 CREATE POLICY "admin_read_abuse_reports"
     ON public.abuse_reports FOR SELECT
-    USING (auth.is_admin());
+    USING (public.is_admin());
 
 -- =============================================================================
 -- END OF MIGRATION 00007
